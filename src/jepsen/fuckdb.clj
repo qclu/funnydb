@@ -1,4 +1,4 @@
-(ns jepsen.chubao
+(ns jepsen.fuckdb
   (:gen-class)
   (:require [clojure.tools.logging :refer :all]
             [clojure.string :as str]
@@ -22,13 +22,15 @@
             [jepsen.control.util :as cu]
             [jepsen.os.debian :as debian]))
 
-(def dir                  "/export/chubaops")
-(def binary               "chubaops")
-(def logfile              "/export/chubaops/chubaops.log")
-(def pidfile              "/export/chubaops/chubaops.pid")
-(def config-file          "/export/chubaops/ps.toml")
-(def log-dir              "/export/chubaops/logs/")
-(def data-dir             "/export/chubaops/datas/")
+(def dir                  "/export/fuckdbps")
+(def binary               "fuckdbps")
+(def logfile              "/export/fuckdbps/fuckdbps.log")
+(def logfile              "/export/fuckdbps/fuckdbps.log")
+(def pidfile              "/export/fuckdbps/fuckdbps.pid")
+(def pidfile              "/export/fuckdbps/fuckdbps.pid")
+(def config-file          "/export/fuckdbps/ps.toml")
+(def log-dir              "/export/fuckdbps/logs/")
+(def data-dir             "/export/fuckdbps/datas/")
 
 (def master-addr "10.194.133.194:9917")
 (def router-addr "10.194.133.194:9901")
@@ -243,12 +245,12 @@
         nil))))
    
 (defn db
-  "chubao DB for a particular version."
+  "fuckdb DB for a particular version."
   [version]
   (reify db/DB
     (setup! [_ test node]
       (c/su
-        (info node "installing chubao" version)
+        (info node "installing fuckdb" version)
         ; Remove log file first.
         (c/exec :mkdir log-dir)
         (c/exec :mkdir data-dir)
@@ -263,7 +265,7 @@
         (Thread/sleep 10000)))
 
     (teardown! [_ test node]
-      (info node "tearing down chubao")
+      (info node "tearing down fuckdb")
       (cu/stop-daemon! binary pidfile)
       (c/su
         (c/exec :rm :-rf data-dir)               
@@ -362,15 +364,15 @@
 (defn r   [_ _] {:type :invoke, :f :read, :value nil})
 (defn w   [_ _] {:type :invoke, :f :write, :value (rand-int 5)})
 
-(defn chubao-test
+(defn fuckdb-test
   "Given an options map from the command-line runner (e.g. :nodes, :ssh,
   :concurrency, ...), constructs a test map."
   [opts]
   (info :opts opts)
   (merge tests/noop-test
-         {:name "chubao"
+         {:name "fuckdb"
           :os debian/os
-          :db (db "tig-chubao")
+          :db (db "tig-fuckdb")
           :client (client nil)
           :nemesis (nemesis/partition-random-halves)
           ;:nemesis (nemesis opts)
@@ -400,7 +402,7 @@
   "Handles command line arguments. Can either run a test, or a web server for
   browsing results."
   [& args]
-  (cli/run! (merge (cli/single-test-cmd {:test-fn chubao-test})
+  (cli/run! (merge (cli/single-test-cmd {:test-fn fuckdb-test})
                    (cli/serve-cmd))
             args))
 
