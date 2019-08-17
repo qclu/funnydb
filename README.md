@@ -1,7 +1,10 @@
 # jepsen.fuck
 # jepsen.fuck
 
-A Clojure library designed to ... well, that part is up to you.
+this is just a db testcase of jepsen, OK?
+
+Rename to fuck means nothing but for someone's tone.
+OK, just neglect.
 
 ## Usage
 
